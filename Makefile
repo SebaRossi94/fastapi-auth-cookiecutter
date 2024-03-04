@@ -13,8 +13,8 @@ dbupgrade:
 dbdowngrade:
 	poetry run alembic downgrade head
 
-flakerun:
+runflake:
 	poetry run flake8 app
 
-make blackrun:
+make runblack:
 	poetry run black app

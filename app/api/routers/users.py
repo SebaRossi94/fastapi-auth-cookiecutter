@@ -11,7 +11,7 @@ users_router = APIRouter(prefix="/users", tags=["users"])
 
 @users_router.get("/me", response_model=ResponseUserSchema)
 def me(user_data: jwt_dependency, db: get_session_dependency):
-    user = db.exec(select(User).where(User.email == user_data["email"], User.id == user_data["id"])).first()
+    user = db.exec(select(User).where(User.email == user_data.email, User.id == user_data.id)).first()
     return user
 
 

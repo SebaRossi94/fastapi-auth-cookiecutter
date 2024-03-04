@@ -5,6 +5,7 @@ from typing import Annotated
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
+from app.api.schemas.token import TokenData
 
 from app.settings import Settings
 
@@ -32,9 +33,9 @@ def validate_access_token(token: token_dependency):
         if email is None or user_id is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user")
         else:
-            return {"email": email, "id": user_id}
+            return TokenData(id=user_id, email=email)
     except JWTError as e:
         logger.logger.exception(e)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user")
 
-jwt_dependency = Annotated[dict, Depends(validate_access_token)]
+jwt_dependency = Annotated[TokenData, Depends(validate_access_token)]

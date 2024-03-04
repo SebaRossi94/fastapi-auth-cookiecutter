@@ -17,25 +17,36 @@ token_dependency = Annotated[str, Depends(oauth2_scheme)]
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-
-def create_access_token(email: str, id: int, expires_in: int = Settings().jwt_expires_in):
+def create_access_token(
+    email: str, id: int, expires_in: int = Settings().jwt_expires_in
+):
     encode = {"sub": email, "id": id}
     expires = datetime.utcnow() + timedelta(minutes=expires_in)
     encode.update({"exp": expires})
-    return jwt.encode(encode, key=Settings().jwt_secret_key, algorithm=Settings().jwt_algorithm)
+    return jwt.encode(
+        encode, key=Settings().jwt_secret_key, algorithm=Settings().jwt_algorithm
+    )
 
 
 def validate_access_token(token: token_dependency):
     try:
-        token_payload = jwt.decode(token, key=Settings().jwt_secret_key, algorithms=Settings().jwt_algorithm)
+        token_payload = jwt.decode(
+            token, key=Settings().jwt_secret_key, algorithms=Settings().jwt_algorithm
+        )
         email = token_payload.get("sub")
         user_id = token_payload.get("id")
         if email is None or user_id is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate user",
+            )
         else:
             return TokenData(id=user_id, email=email)
     except JWTError as e:
         logger.logger.exception(e)
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user"
+        )
+
 
 jwt_dependency = Annotated[TokenData, Depends(validate_access_token)]

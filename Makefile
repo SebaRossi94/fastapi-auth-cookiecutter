@@ -12,3 +12,9 @@ dbupgrade:
 
 dbdowngrade:
 	poetry run alembic downgrade head
+
+flakerun:
+	poetry run flake8 app
+
+make blackrun:
+	poetry run black app

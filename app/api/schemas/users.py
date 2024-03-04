@@ -7,6 +7,7 @@ class ResponseUserSchema(BaseModel):
     last_name: str | None = None
     email: EmailStr
 
+
 class CreateUserSchema(BaseModel):
     first_name: str | None = None
     last_name: str | None = None
@@ -14,4 +15,3 @@ class CreateUserSchema(BaseModel):
     password: str
     active: bool = True
     superuser: bool = False
-

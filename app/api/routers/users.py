@@ -11,7 +11,9 @@ users_router = APIRouter(prefix="/users", tags=["users"])
 
 @users_router.get("/me", response_model=ResponseUserSchema)
 def me(user_data: jwt_dependency, db: get_session_dependency):
-    user = db.exec(select(User).where(User.email == user_data.email, User.id == user_data.id)).first()
+    user = db.exec(
+        select(User).where(User.email == user_data.email, User.id == user_data.id)
+    ).first()
     return user
 
 
@@ -25,7 +27,11 @@ def create_user(db: get_session_dependency, user_data: CreateUserSchema):
         db.commit()
     except IntegrityError as e:
         print(e)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists"
+        )
     except Exception as e:
         print(e)
-        raise HTTPException(status_code=status.HTTP_418_IM_A_TEAPOT, detail="Unhandled Error")
+        raise HTTPException(
+            status_code=status.HTTP_418_IM_A_TEAPOT, detail="Unhandled Error"
+        )

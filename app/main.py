@@ -7,10 +7,11 @@ app = FastAPI()
 
 app.include_router(main_router)
 
+
 @app.get("/", tags=["test"])
 async def home(settings: settings_dependency, token: token_dependency):
     return {
         "Welcome": "Auth cookiecutter!",
         "settings": settings.__dict__,
-        "token": token
+        "token": token,
     }

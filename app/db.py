@@ -7,9 +7,7 @@ from sqlmodel import Field, SQLModel, Session
 from .settings import settings
 
 
-engine = create_engine(
-    settings.sql_alchemy_database_url
-)
+engine = create_engine(settings.sql_alchemy_database_url)
 
 
 class SQLBaseModel(SQLModel):

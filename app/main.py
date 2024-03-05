@@ -16,8 +16,4 @@ async def home(settings: settings_dependency, db: get_session_dependency):
     except Exception as e:
         logger.logger.error(e)
         db_up = False
-    return {
-        "application_up": True,
-        "settings": settings.__dict__,
-        "database_up": db_up
-    }
+    return {"application_up": True, "settings": settings.__dict__, "database_up": db_up}

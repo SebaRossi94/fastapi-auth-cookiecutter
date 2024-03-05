@@ -13,4 +13,4 @@ def test_home(app):
     assert (
         response.json()["settings"]["sql_alchemy_database_url"] == "sqlite:///db.sqlite"
     )
-    assert response.json()["database_up"] == True
+    assert response.json()["database_up"] is True

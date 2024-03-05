@@ -17,9 +17,7 @@ token_dependency = Annotated[str, Depends(oauth2_scheme)]
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def create_access_token(
-    email: str, id: int, expires_in: int = settings.jwt_expires_in
-):
+def create_access_token(email: str, id: int, expires_in: int = settings.jwt_expires_in):
     encode = {"sub": email, "id": id}
     expires = datetime.utcnow() + timedelta(minutes=expires_in)
     encode.update({"exp": expires})

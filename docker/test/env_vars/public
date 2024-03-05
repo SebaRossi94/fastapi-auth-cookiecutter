@@ -1,0 +1,4 @@
+API_HOST=0.0.0.0
+APP_ENV=test
+SQL_ALCHEMY_DATABASE_URL=sqlite:///db.sqlite
+WDB_SOCKET_SERVER=fastapi_auth_wdb

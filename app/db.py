@@ -4,14 +4,11 @@ from fastapi import Depends
 from sqlalchemy import Column, DateTime, create_engine, event
 from sqlmodel import Field, SQLModel, Session
 
-from .settings import Settings
+from .settings import settings
 
 
 engine = create_engine(
-    Settings().sql_alchemy_database_url,
-    connect_args={
-        "check_same_thread": "sqlite" not in Settings().sql_alchemy_database_url
-    },
+    settings.sql_alchemy_database_url
 )
 
 

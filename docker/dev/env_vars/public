@@ -1,0 +1,4 @@
+API_HOST=0.0.0.0
+APP_ENV=debug
+SQL_ALCHEMY_DATABASE_URL=postgresql://postgres:postgres@fastapi_auth_db/postgres
+WDB_SOCKET_SERVER=fastapi_auth_wdb

@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  fastapi_auth_app:
+    container_name: fastapi_auth_app
+    platform: linux/x86_64
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    env_file:
+      - docker/${DOCKER_ENV}/env_vars/public
+      - docker/${DOCKER_ENV}/env_vars/private
+    volumes:
+      - ./:/app
+    ports:
+      - "8000:8000"
+    command: bash ./docker/start.sh
+
+  fastapi_auth_db:
+    container_name: fastapi_auth_db
+    image: postgres:12
+    ports:
+      - "5432:5432"
+    env_file:
+      - docker/dev/env_vars/postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "postgres"]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+
+  fastapi_auth_wdb:
+    image: kozea/wdb
+    ports:
+      - "1984:1984"
+
+volumes:
+  pgdata: {}

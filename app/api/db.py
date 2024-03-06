@@ -4,11 +4,10 @@ from fastapi import Depends
 from sqlalchemy import Column, DateTime, create_engine, event
 from sqlmodel import Field, SQLModel, Session
 
-from .settings import settings
+from app.settings import settings
 
 
 engine = create_engine(settings.sql_alchemy_database_url)
-
 
 class SQLBaseModel(SQLModel):
     pass
@@ -28,11 +27,6 @@ class SQLBaseModelAudit(SQLBaseModel):
 @event.listens_for(SQLBaseModelAudit, "before_update", propagate=True)
 def updated_at(mapper, connection, target):
     target.updated_at = datetime.utcnow()
-
-
-def init_db():
-    with engine.begin() as conn:
-        conn.run_sync(SQLBaseModel.metadata.create_all)
 
 
 def get_session():

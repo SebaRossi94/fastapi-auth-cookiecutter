@@ -1,8 +1,8 @@
 from sqlite3 import IntegrityError
 from fastapi import APIRouter, HTTPException, status
 from sqlmodel import select
-from app.db import get_session_dependency
-from app.auth import jwt_dependency
+from app.api.db import get_session_dependency
+from app.api.auth import jwt_dependency
 from app.api.schemas.users import CreateUserSchema, ResponseUserSchema
 from app.api.models.users import User
 

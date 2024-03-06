@@ -1,8 +1,8 @@
 from pydantic import EmailStr
 from sqlalchemy import Boolean, Column, Integer, String
 from sqlmodel import Field, select
-from app.db import SQLBaseModelAudit, get_session_dependency
-from app.auth import bcrypt_context
+from app.api.db import SQLBaseModelAudit, get_session_dependency
+from app.api.auth import bcrypt_context
 
 
 class User(SQLBaseModelAudit, table=True):

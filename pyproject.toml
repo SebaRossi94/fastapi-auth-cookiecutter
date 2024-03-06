@@ -24,7 +24,7 @@ pytest = "^8.0.2"
 httpx = "^0.27.0"
 psycopg2 = "^2.9.9"
 wdb = "^3.3.0"
-debugpy = "^1.8.1"
+pytest-cov = "^4.1.0"
 
 
 [build-system]
@@ -33,3 +33,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 target-version = ["py311"]
+
+[tool.pytest.ini_options]
+addopts = "--cov /app/app/api --cov-report term --cov-fail-under 85 --cov-report=html"
+filterwarnings = ["error", "ignore::DeprecationWarning"]

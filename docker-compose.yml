@@ -10,11 +10,15 @@ services:
     env_file:
       - docker/${DOCKER_ENV}/env_vars/public
       - docker/${DOCKER_ENV}/env_vars/private
+    links:
+      - fastapi_auth_wdb
     volumes:
       - ./:/app
     ports:
       - "8000:8000"
     command: bash ./docker/start.sh
+    networks:
+      - default
 
   fastapi_auth_db:
     container_name: fastapi_auth_db
@@ -31,11 +35,19 @@ services:
       timeout: 60s
       retries: 5
       start_period: 10s
+    networks:
+      - default
 
   fastapi_auth_wdb:
     image: kozea/wdb
     ports:
       - "1984:1984"
+    networks:
+      - default
 
 volumes:
   pgdata: {}
+
+networks:
+  default:
+    driver: bridge

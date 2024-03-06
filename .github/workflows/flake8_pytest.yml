@@ -38,10 +38,12 @@ jobs:
     
     - name: Run flake8
       run: |
-        source venv/bin/activate 
+        source venv/bin/activate
+        env
         flake8 --max-line-length 88 --ignore F403,F401 app/
           
     - name: Run pytest
       run: |
-        source venv/bin/activate 
+        source venv/bin/activate
+        env
         coverage run -m pytest --cov app/api --cov-report term --cov-report xml:coverage.xml --cov-fail-under 85

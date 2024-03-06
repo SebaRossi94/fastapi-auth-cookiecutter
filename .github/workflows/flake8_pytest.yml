@@ -10,6 +10,12 @@ on:
       - main
       - staging
 
+env:
+  APP_ENV: test
+  SQL_ALCHEMY_DATABASE_URL: sqlite:///db.sqlite
+  JWT_SECRET_KEY: supersecretkey
+  JWT_ALGORITHM: HS256
+  JWT_EXPIRES_IN: 20
 jobs:
   flake8_and_pytest:
     name: Flake and Pytest
@@ -28,11 +34,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install virtualenv poetry
         virtualenv venv
-        source venv/bin/activate    
-        source docker/test/env_vars/public
-        export $(cut -d= -f1 docker/test/env_vars/public)
-        source docker/test/env_vars/private
-        export $(cut -d= -f1 docker/test/env_vars/private)
+        source venv/bin/activate
         poetry export --without-hashes --format=requirements.txt > requirements.txt
         pip install -r requirements.txt
     

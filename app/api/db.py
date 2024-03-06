@@ -9,6 +9,7 @@ from app.settings import settings
 
 engine = create_engine(settings.sql_alchemy_database_url)
 
+
 class SQLBaseModel(SQLModel):
     pass
 

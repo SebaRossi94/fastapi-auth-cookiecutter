@@ -8,6 +8,7 @@ from app.api.db import get_session_dependency
 
 health_router = APIRouter(prefix="/healthcheck", tags=["health"])
 
+
 @health_router.get("/")
 async def health(settings: settings_dependency, db: get_session_dependency):
     try:

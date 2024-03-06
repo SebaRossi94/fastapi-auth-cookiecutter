@@ -1,7 +1,5 @@
 from fastapi.testclient import TestClient
 
-from app.api.schemas.token import TokenData
-from app.api.auth import jwt_dependency
 from app.tests.conftest import fake_users
 
 
@@ -30,4 +28,4 @@ def test_create_user_success(app_with_db):
     create_user_response = client.post("/users/", json=user_data, headers=headers)
     print(create_user_response.json())
     assert create_user_response.status_code == 201
-    assert create_user_response.json() == None
+    assert create_user_response.json() is None

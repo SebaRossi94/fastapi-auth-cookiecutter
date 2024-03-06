@@ -11,8 +11,8 @@ on:
       - staging
 
 jobs:
-  setup:
-    name: Setup
+  flake8_and_pytest:
+    name: Fale and Pytest
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -35,22 +35,11 @@ jobs:
         export $(cut -d= -f1 docker/test/env_vars/private)
         poetry export --without-hashes --format=requirements.txt > requirements.txt
         pip install -r requirements.txt
-      
-        
-  flake8:
-    name: Run Flake8
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
+    
     - name: Run flake8
       run: |
         flake8 --max-line-length 88 --ignore F403,F401 app/
           
-  pytest:
-    name: Run pytest
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
     - name: Run pytest
       run: |
         coverage run -m pytest --cov app/api --cov-report term --cov-report xml:coverage.xml --cov-fail-under 85

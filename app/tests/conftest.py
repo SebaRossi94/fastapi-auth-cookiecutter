@@ -30,10 +30,12 @@ fake_users = {
     ),
 }
 
+
 @pytest.fixture(scope="function")
 def app_with_db():
     from app.main import app
     from app.api.db import SQLBaseModel, get_session
+
     engine = create_engine(
         settings.sql_alchemy_database_url,
         connect_args={"check_same_thread": False},
@@ -43,16 +45,15 @@ def app_with_db():
         with Session(engine, autoflush=True) as session:
             yield session
 
-
     app.dependency_overrides[get_session] = override_get_session
 
     SQLBaseModel.metadata.create_all(bind=engine)
-    
+
     with Session(engine) as session:
         for user in fake_users.values():
             session.add(user)
         session.commit()
-   
+
     yield app
 
     app.dependency_overrides = {}
@@ -63,15 +64,15 @@ def app_with_db():
 @pytest.fixture
 def app_without_db(app_with_db):
     from app.api.db import get_session
+
     engine = create_engine(
         settings.sql_alchemy_database_url,
         connect_args={"check_same_thread": False},
     )
-    
+
     def override_get_session():
         with Session(engine.dispose(), autoflush=True) as session:
             yield session
-
 
     app_with_db.dependency_overrides[get_session] = override_get_session
 
@@ -82,11 +83,14 @@ def app_without_db(app_with_db):
 def app_with_db_and_jwt(app_with_db):
     from app.api.auth import validate_access_token, token_dependency
     from app.api.schemas.token import TokenData
+
     def override_token_dependency():
-        return 
+        return
+
     def override_jwt_dependency(fake_jwt):
         print(fake_jwt)
         return TokenData(id=1, email="jointhedarkside@empire.com")
+
     app_with_db.dependency_overrides[validate_access_token] = override_jwt_dependency
     app_with_db.dependency_overrides[token_dependency] = override_token_dependency
     yield app_with_db

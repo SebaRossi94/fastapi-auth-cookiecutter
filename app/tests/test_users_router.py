@@ -11,6 +11,7 @@ from app.tests.conftest import fake_users
 #     print(me_response.json())
 #     assert me_response.status_code == 200
 
+
 def test_me_no_auth(app_with_db):
     client = TestClient(app_with_db)
     me_response = client.get("/users/me")
@@ -24,7 +25,7 @@ def test_create_user_success(app_with_db):
         "email": "user@example.com",
         "password": "password",
         "first_name": "first",
-        "last_name": "last"
+        "last_name": "last",
     }
     headers = {"Content-Type": "application/json"}
     client = TestClient(app_with_db)
@@ -36,6 +37,7 @@ def test_create_user_success(app_with_db):
     assert create_user_response.json()["first_name"] == user_data["first_name"]
     assert create_user_response.json()["last_name"] == user_data["last_name"]
     assert "id" in create_user_response.json().keys()
+
 
 def test_create_user_already_exists(app_with_db):
     darth_user = fake_users["darth"]

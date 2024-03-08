@@ -22,12 +22,16 @@ def get_all_users(_: jwt_dependency, db: get_session_dependency):
     users = UserRepository.get_all(db=db)
     return users
 
-@users_router.post("/", status_code=status.HTTP_201_CREATED, response_model=ResponseUserSchema)
+
+@users_router.post(
+    "/", status_code=status.HTTP_201_CREATED, response_model=ResponseUserSchema
+)
 def create_user(db: get_session_dependency, user_data: CreateUserSchema):
     hashed_password = User.hash_password(user_data.password)
     user_data.password = hashed_password
     user = UserRepository.create(data=user_data.__dict__, db=db)
     return user
+
 
 @users_router.patch("/{user_id}", response_model=ResponseUserSchema)
 def update_user(user_id: int, user_data: UpdateUserSchema, db: get_session_dependency):

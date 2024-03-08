@@ -16,6 +16,7 @@ services:
       - ./:/app
     ports:
       - "8000:8000"
+      - "5678:5678"
     command: bash ./docker/start.sh
     networks:
       - default
@@ -49,5 +50,6 @@ volumes:
   pgdata: {}
 
 networks:
-  default:
+  my-network: 
+    name: default
     driver: bridge

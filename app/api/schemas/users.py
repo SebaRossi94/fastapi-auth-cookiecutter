@@ -15,3 +15,7 @@ class CreateUserSchema(BaseModel):
     password: str
     active: bool = True
     superuser: bool = False
+
+class UpdateUserSchema(BaseModel):
+    first_name: str | None = None
+    last_name: str | None = None

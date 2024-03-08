@@ -32,16 +32,8 @@ def updated_at(mapper, connection, target):
 
 def get_session():
     with Session(engine, autoflush=True) as session:
-        with session.begin():
-            yield session
-
-
-def get_session_no_transaction():
-    with Session(engine) as session:
         yield session
 
 
+
 get_session_dependency = Annotated[Session, Depends(get_session)]
-get_session_no_transaction_dependency = Annotated[
-    Session, Depends(get_session_no_transaction)
-]

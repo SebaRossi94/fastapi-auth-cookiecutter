@@ -78,6 +78,26 @@ def test_create_user_success(app_with_db, mocker):
     spy.assert_called_once()
 
 
+def test_create_user_already_exists(app_with_db, mocker):
+    user_data = {
+        "email": "jointhedarkside@empire.com",
+        "password": "password",
+        "first_name": "first",
+        "last_name": "last",
+    }
+    headers = {"Content-Type": "application/json"}
+    spy = mocker.spy(UsersService, "create")
+    client = TestClient(app_with_db)
+    create_user_response = client.post("/users/", json=user_data, headers=headers)
+    print(create_user_response.json())
+    assert create_user_response.status_code == 409
+    assert create_user_response.json() == {
+        "message": "User already exists",
+        "identifier": {"email": "jointhedarkside@empire.com"},
+    }
+    spy.assert_called_once()
+
+
 def test_patch_user_success(app_with_db, mocker):
     user_data = {
         "first_name": "first",
@@ -96,22 +116,19 @@ def test_patch_user_success(app_with_db, mocker):
     spy.assert_called_once()
 
 
-def test_create_user_already_exists(app_with_db, mocker):
+def test_patch_user_not_found(app_with_db, mocker):
     user_data = {
-        "email": "jointhedarkside@empire.com",
-        "password": "password",
         "first_name": "first",
         "last_name": "last",
     }
     headers = {"Content-Type": "application/json"}
-    spy = mocker.spy(UsersService, "create")
     client = TestClient(app_with_db)
-    create_user_response = client.post("/users/", json=user_data, headers=headers)
-    print(create_user_response.json())
-    assert create_user_response.status_code == 409
-    assert create_user_response.json() == {
-        "message": "User already exists",
-        "identifier": {"email": "jointhedarkside@empire.com"},
+    spy = mocker.spy(UsersService, "update")
+    patch_user_response = client.patch("/users/10", json=user_data, headers=headers)
+    assert patch_user_response.status_code == 404
+    assert patch_user_response.json() == {
+        "message": "User not found",
+        "identifier": {"id": 10},
     }
     spy.assert_called_once()
 

@@ -17,13 +17,17 @@ def test_me_success(app_with_db_and_jwt, mocker):
     assert me_response.json()["email"] == fake_users["darth"].email
     spy.assert_called_once()
 
+
 def test_me_user_not_found(app_with_db_and_fake_jwt, mocker):
     client = TestClient(app_with_db_and_fake_jwt)
     spy = mocker.spy(UsersService, "get_one")
     me_response = client.get("/users/me")
     print(me_response.json())
     assert me_response.status_code == 404
-    assert me_response.json() == {"message": "User not found", "identifier": {"id": 10, "email": "fake_jwt@test.com"}}
+    assert me_response.json() == {
+        "message": "User not found",
+        "identifier": {"id": 10, "email": "fake_jwt@test.com"},
+    }
     spy.assert_called_once()
 
 
@@ -32,6 +36,7 @@ def test_me_no_auth(app_with_db):
     me_response = client.get("/users/me")
     assert me_response.status_code == 401
     assert me_response.json()["detail"] == "Not authenticated"
+
 
 def test_get_all_users_success(app_with_db, mocker):
     client = TestClient(app_with_db)
@@ -90,6 +95,7 @@ def test_patch_user_success(app_with_db, mocker):
     assert "id" in patch_user_response.json().keys()
     spy.assert_called_once()
 
+
 def test_create_user_already_exists(app_with_db, mocker):
     user_data = {
         "email": "jointhedarkside@empire.com",
@@ -103,7 +109,10 @@ def test_create_user_already_exists(app_with_db, mocker):
     create_user_response = client.post("/users/", json=user_data, headers=headers)
     print(create_user_response.json())
     assert create_user_response.status_code == 409
-    assert create_user_response.json() == {"message": "User already exists", "identifier": {"email": "jointhedarkside@empire.com"}}
+    assert create_user_response.json() == {
+        "message": "User already exists",
+        "identifier": {"email": "jointhedarkside@empire.com"},
+    }
     spy.assert_called_once()
 
 
@@ -115,11 +124,13 @@ def test_delete_user_by_id_success(app_with_db, mocker):
     spy.assert_called_once()
 
 
-
 def test_delete_user_by_id_fails(app_with_db, mocker):
     spy = mocker.spy(UsersService, "delete")
     client = TestClient(app_with_db)
     me_response = client.delete("/users/100")
     assert me_response.status_code == 404
-    assert me_response.json() == {"message": "User not found", "identifier": {"id": 100}}
+    assert me_response.json() == {
+        "message": "User not found",
+        "identifier": {"id": 100},
+    }
     spy.assert_called_once()

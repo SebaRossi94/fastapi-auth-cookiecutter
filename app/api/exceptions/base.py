@@ -1,10 +1,18 @@
 from typing import Type
 from fastapi import status
 from fastapi.responses import JSONResponse
-from app.api.schemas.errors import BaseError, BaseIdentifiedError, NotFoundError, ImATeapotError, AlreadyExistsError
+from app.api.schemas.errors import (
+    BaseError,
+    BaseIdentifiedError,
+    NotFoundError,
+    ImATeapotError,
+    AlreadyExistsError,
+)
+
 
 class BaseAPIException(Exception):
     """Base error for custom API exceptions"""
+
     message = "Generic error"
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     model = BaseError
@@ -16,20 +24,23 @@ class BaseAPIException(Exception):
 
     def __str__(self):
         return self.message
-    
+
     def response(self):
-        return JSONResponse(status_code=self.status_code, content=self.data.model_dump())
+        return JSONResponse(
+            status_code=self.status_code, content=self.data.model_dump()
+        )
 
     @classmethod
     def response_model(cls):
         return {cls.status_code: {"model": cls.model}}
 
+
 class BaseIdentifiedException(BaseAPIException):
     """Base error for custom API exceptions that have an identifier"""
-    message = "Identity error"
-    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR    
-    model = BaseIdentifiedError
 
+    message = "Identity error"
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    model = BaseIdentifiedError
 
     def __init__(self, identifier, **kwargs):
         super().__init__(identifier=identifier, **kwargs)
@@ -45,6 +56,7 @@ class AlreadyExistsException(BaseIdentifiedException):
     message = "Identity already exists"
     status_code = status.HTTP_409_CONFLICT
     model = AlreadyExistsError
+
 
 class ImATeapotException(BaseAPIException):
     message = "Unhandled error"

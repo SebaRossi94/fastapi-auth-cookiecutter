@@ -109,6 +109,7 @@ def app_with_db_and_jwt(app_with_db):
     yield app_with_db
     app_with_db.dependency_overrides = {}
 
+
 @pytest.fixture(scope="function")
 def app_with_db_and_fake_jwt(app_with_db):
     from app.api.auth import validate_access_token, token_dependency

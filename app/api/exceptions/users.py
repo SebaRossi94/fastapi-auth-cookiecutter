@@ -10,4 +10,3 @@ class UserNotFoundException(NotFoundException):
 
 class UserAlreadyExistsException(AlreadyExistsException):
     message = "User already exists"
-

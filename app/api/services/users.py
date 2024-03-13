@@ -66,7 +66,9 @@ class UsersService:
             return user
         except IntegrityError as e:
             logger.logger.exception(e)
-            return UserAlreadyExistsException(identifier={"email": data["email"]}).response()
+            return UserAlreadyExistsException(
+                identifier={"email": data["email"]}
+            ).response()
         except Exception as e:
             logger.logger.exception(e)
             return ImATeapotException().response()

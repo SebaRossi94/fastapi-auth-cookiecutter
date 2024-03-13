@@ -3,8 +3,8 @@ from sqlmodel import Session
 from sqlalchemy.exc import IntegrityError
 
 from fastapi import logger
+from app.api.exceptions.base import ImATeapotException
 from app.api.exceptions.users import (
-    InvalidFilterParameterException,
     UserAlreadyExistsException,
     UserNotFoundException,
 )
@@ -26,34 +26,37 @@ class UsersService:
     def get_one(
         cls, filter: Optional[dict] = None, db: Optional[Session] = None
     ) -> User:
-
-        if filter:
-            try:
+        try:
+            if filter:
+                filter_dict = filter.copy()
                 filter = [getattr(cls.model, k) == v for k, v in filter.items()]
-            except AttributeError as e:
-                logger.logger.exception(e)
-                raise InvalidFilterParameterException()
-        user = UserRepository.get(filter=filter, db=db).one_or_none()
-        if not user:
-            raise UserNotFoundException()
-        else:
-            return user
+            user = UserRepository.get(filter=filter, db=db).one_or_none()
+            if not user:
+                filter = filter_dict
+                return UserNotFoundException(identifier=filter).response()
+            else:
+                return user
+        except Exception as e:
+            logger.logger.exception(e)
+            return ImATeapotException().response()
 
     @classmethod
     def get_all(
         cls, filter: Optional[dict] = None, db: Optional[Session] = None
     ) -> list[User]:
-        if filter:
-            try:
+        try:
+            if filter:
+                filter_dict = filter.copy()
                 filter = [getattr(cls.model, k) == v for k, v in filter.items()]
-            except AttributeError as e:
-                logger.logger.exception(e)
-                raise InvalidFilterParameterException()
-        users = UserRepository.get(filter=filter, db=db).all()
-        if not users:
-            raise UserNotFoundException()
-        else:
-            return users
+            users = UserRepository.get(filter=filter, db=db).all()
+            if not users:
+                filter = filter_dict
+                return UserNotFoundException(identifier=filter).response()
+            else:
+                return users
+        except Exception as e:
+            logger.logger.exception(e)
+            return ImATeapotException().response()
 
     @classmethod
     def create(cls, data: dict = None, db: Optional[Session] = None):
@@ -63,7 +66,10 @@ class UsersService:
             return user
         except IntegrityError as e:
             logger.logger.exception(e)
-            raise UserAlreadyExistsException()
+            return UserAlreadyExistsException(identifier={"email": data["email"]}).response()
+        except Exception as e:
+            logger.logger.exception(e)
+            return ImATeapotException().response()
 
     @classmethod
     def update(
@@ -72,26 +78,30 @@ class UsersService:
         data: dict[str, Any] = None,
         db: Optional[Session] = None,
     ):
-        if filter:
-            try:
+        try:
+            if filter:
+                filter_dict = filter.copy()
                 filter = [getattr(cls.model, k) == v for k, v in filter.items()]
-            except AttributeError as e:
-                logger.logger.exception(e)
-                raise InvalidFilterParameterException()
-        user = UserRepository.update(filter=filter, data=data, db=db)
-        if not user:
-            raise UserNotFoundException()
-        return user
+            user = UserRepository.update(filter=filter, data=data, db=db)
+            if not user:
+                filter = filter_dict
+                return UserNotFoundException(identifier=filter).response()
+            return user
+        except Exception as e:
+            logger.logger.exception(e)
+            return ImATeapotException().response()
 
     @classmethod
     def delete(cls, filter: dict[str, Any] = None, db: Optional[Session] = None):
-        if filter:
-            try:
+        try:
+            if filter:
+                filter_dict = filter.copy()
                 filter = [getattr(cls.model, k) == v for k, v in filter.items()]
-            except AttributeError as e:
-                logger.logger.exception(e)
-                raise InvalidFilterParameterException()
-        deleted = UserRepository.delete(filter=filter, db=db)
-        if not deleted:
-            raise UserNotFoundException()
-        return None
+            deleted = UserRepository.delete(filter=filter, db=db)
+            if not deleted:
+                filter = filter_dict
+                return UserNotFoundException(identifier=filter).response()
+            return None
+        except Exception as e:
+            logger.logger.exception(e)
+            return ImATeapotException().response()

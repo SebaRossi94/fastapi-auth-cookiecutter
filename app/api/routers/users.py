@@ -3,8 +3,8 @@ from fastapi import APIRouter, HTTPException, logger, status
 
 from app.api.db import get_session_dependency
 from app.api.auth import jwt_dependency
+from app.api.exceptions.base import ImATeapotException, get_exception_responses
 from app.api.exceptions.users import (
-    InvalidFilterParameterException,
     UserAlreadyExistsException,
     UserNotFoundException,
 )
@@ -15,36 +15,47 @@ from app.api.services.users import UsersService
 users_router = APIRouter(prefix="/users", tags=["users"])
 
 
-@users_router.get("/me", response_model=Optional[ResponseUserSchema])
-@users_router.get("/me", response_model=Optional[ResponseUserSchema])
+@users_router.get("/me", response_model=Optional[ResponseUserSchema], responses=get_exception_responses(UserNotFoundException, ImATeapotException))
 def me(user_data: jwt_dependency, db: get_session_dependency):
-    user = UserRepository.get_one(filter=user_data.__dict__, db=db)
+    user = UsersService.get_one(filter=user_data.__dict__, db=db)
     return user
 
 
-@users_router.get("/all", response_model=List[ResponseUserSchema])
-def get_all_users(_: jwt_dependency, db: get_session_dependency):
-    users = UserRepository.get_all(db=db)
+@users_router.get("/all", response_model=List[ResponseUserSchema], responses=get_exception_responses(UserNotFoundException, ImATeapotException))
+def get_all_users(db: get_session_dependency):
+    users = UsersService.get_all(filter=None, db=db)
     return users
 
 
+
+@users_router.get("/{user_id}", response_model=ResponseUserSchema, responses=get_exception_responses(UserNotFoundException, ImATeapotException))
+def get_user_by_id(user_id: int, db: get_session_dependency):
+    filter = {"id": user_id}
+    user = UsersService.get_one(filter=filter, db=db)
+    return user
+
+
 @users_router.post(
-    "/", status_code=status.HTTP_201_CREATED, response_model=ResponseUserSchema
+    "/", status_code=status.HTTP_201_CREATED, response_model=ResponseUserSchema, responses=get_exception_responses(UserAlreadyExistsException, ImATeapotException)
 )
 def create_user(db: get_session_dependency, user_data: CreateUserSchema):
     hashed_password = User.hash_password(user_data.password)
     user_data.password = hashed_password
-    user = UserRepository.create(data=user_data.__dict__, db=db)
+    user = UsersService.create(data=user_data.__dict__, db=db)
     return user
 
 
-@users_router.patch("/{user_id}", response_model=ResponseUserSchema)
+
+@users_router.patch("/{user_id}", response_model=ResponseUserSchema, responses=get_exception_responses(UserNotFoundException, ImATeapotException))
 def update_user(user_id: int, user_data: UpdateUserSchema, db: get_session_dependency):
-    user = UserRepository.patch(user_id, data=user_data.__dict__, db=db)
+    filter = {"id": user_id}
+    user = UsersService.update(filter=filter, data=user_data.__dict__, db=db)
     return user
 
 
-@users_router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+
+@users_router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT, responses=get_exception_responses(UserNotFoundException, ImATeapotException))
 def delete_user(user_id: int, db: get_session_dependency):
-    user = UserRepository.delete(user_id, db=db)
-    return user
+    filter = {"id": user_id}
+    deleted = UsersService.delete(filter=filter, db=db)
+    return deleted

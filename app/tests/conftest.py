@@ -10,6 +10,7 @@ from app.settings import settings
 
 fake_users = {
     "darth": User(
+        id=1,
         first_name="Darth",
         last_name="Vader",
         email="jointhedarkside@empire.com",
@@ -18,6 +19,7 @@ fake_users = {
         superuser=True,
     ),
     "luke": User(
+        id=2,
         first_name="Luke",
         last_name="Skywalker",
         email="jointhelightside@rebels.com",
@@ -42,17 +44,17 @@ def test_engine():
 @pytest.fixture(scope="package")
 def populate_db(test_engine):
     from app.api.db import SQLBaseModel
+
     SQLBaseModel.metadata.create_all(bind=test_engine)
 
     with Session(test_engine) as session:
         for user in fake_users.values():
             session.add(user)
         session.commit()
-    
-    yield
-    
-    SQLBaseModel.metadata.drop_all(bind=test_engine)
 
+    yield
+
+    SQLBaseModel.metadata.drop_all(bind=test_engine)
 
 
 @pytest.fixture
@@ -74,11 +76,12 @@ def app_with_db(test_engine, populate_db):
 @pytest.fixture(scope="function")
 def app_without_db(app_with_db):
     from app.api.db import get_session
+
     fake_engine = create_engine(
         settings.sql_alchemy_database_url,
         connect_args={"check_same_thread": False},
     )
-    
+
     def override_get_session():
         with Session(fake_engine.dispose(), autoflush=True) as session:
             yield session
@@ -88,6 +91,7 @@ def app_without_db(app_with_db):
     yield app_with_db
 
     app_with_db.dependency_overrides = {}
+
 
 @pytest.fixture(scope="function")
 def app_with_db_and_jwt(app_with_db):
@@ -99,6 +103,22 @@ def app_with_db_and_jwt(app_with_db):
 
     def override_jwt_dependency():
         return TokenData(id=1, email="jointhedarkside@empire.com")
+
+    app_with_db.dependency_overrides[validate_access_token] = override_jwt_dependency
+    app_with_db.dependency_overrides[token_dependency] = override_token_dependency
+    yield app_with_db
+    app_with_db.dependency_overrides = {}
+
+@pytest.fixture(scope="function")
+def app_with_db_and_fake_jwt(app_with_db):
+    from app.api.auth import validate_access_token, token_dependency
+    from app.api.schemas.token import TokenData
+
+    def override_token_dependency():
+        return
+
+    def override_jwt_dependency():
+        return TokenData(id=10, email="fake_jwt@test.com")
 
     app_with_db.dependency_overrides[validate_access_token] = override_jwt_dependency
     app_with_db.dependency_overrides[token_dependency] = override_token_dependency

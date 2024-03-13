@@ -1,16 +1,21 @@
-from sqlite3 import IntegrityError
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, logger, status
-from sqlmodel import select
+
 from app.api.db import get_session_dependency
 from app.api.auth import jwt_dependency
-from app.api.repositories.users import UserRepository
+from app.api.exceptions.users import (
+    InvalidFilterParameterException,
+    UserAlreadyExistsException,
+    UserNotFoundException,
+)
 from app.api.schemas.users import CreateUserSchema, ResponseUserSchema, UpdateUserSchema
 from app.api.models.users import User
+from app.api.services.users import UsersService
 
 users_router = APIRouter(prefix="/users", tags=["users"])
 
 
+@users_router.get("/me", response_model=Optional[ResponseUserSchema])
 @users_router.get("/me", response_model=Optional[ResponseUserSchema])
 def me(user_data: jwt_dependency, db: get_session_dependency):
     user = UserRepository.get_one(filter=user_data.__dict__, db=db)
